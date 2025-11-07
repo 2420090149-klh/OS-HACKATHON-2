@@ -1,0 +1,68 @@
+﻿{
+    "basic":  {
+                  "characters":  307,
+                  "lines":  1,
+                  "words":  44
+              },
+    "findings":  [
+                     {
+                         "evidence":  [
+                                          "Jun 10 12:16 example kernel: EXT4-fs error (device sda1): ext4_mb_generate_buddy:809: group 3, 10157 blocks in bitmap, 9557 in gd\\nJun 10 12:17 example kernel: [12345.6789] Out of memory: Kill process 1245 (example)\\nJun 10 12:17 example sshd[25456]: Failed password for root from 192.168.1.100 port 22 ssh2"
+                                      ],
+                         "hits":  2,
+                         "rule_id":  "oom_killer",
+                         "severity":  "high",
+                         "suggestion":  "Increase swap; limit memory or identify process causing OOM."
+                     },
+                     {
+                         "evidence":  [
+                                          "Jun 10 12:16 example kernel: EXT4-fs error (device sda1): ext4_mb_generate_buddy:809: group 3, 10157 blocks in bitmap, 9557 in gd\\nJun 10 12:17 example kernel: [12345.6789] Out of memory: Kill process 1245 (example)\\nJun 10 12:17 example sshd[25456]: Failed password for root from 192.168.1.100 port 22 ssh2"
+                                      ],
+                         "hits":  2,
+                         "rule_id":  "ext4_error",
+                         "severity":  "high",
+                         "suggestion":  "Backup data; run SMART and fsck to check/repair the disk."
+                     },
+                     {
+                         "evidence":  [
+                                          "Jun 10 12:16 example kernel: EXT4-fs error (device sda1): ext4_mb_generate_buddy:809: group 3, 10157 blocks in bitmap, 9557 in gd\\nJun 10 12:17 example kernel: [12345.6789] Out of memory: Kill process 1245 (example)\\nJun 10 12:17 example sshd[25456]: Failed password for root from 192.168.1.100 port 22 ssh2"
+                                      ],
+                         "hits":  2,
+                         "rule_id":  "ssh_bruteforce",
+                         "severity":  "low",
+                         "suggestion":  "Harden SSH: use key auth, disable root login, enable fail2ban."
+                     }
+                 ],
+    "nlp":  {
+                "pos_tags":  {
+                                 "IN":  14,
+                                 "NN":  35,
+                                 "VBD":  1
+                             },
+                "sentences":  5,
+                "tokens":  83,
+                "top_words":  [
+                                  {
+                                      "count":  4,
+                                      "word":  "example"
+                                  },
+                                  {
+                                      "count":  3,
+                                      "word":  "10"
+                                  },
+                                  {
+                                      "count":  3,
+                                      "word":  "12"
+                                  },
+                                  {
+                                      "count":  2,
+                                      "word":  "kernel"
+                                  },
+                                  {
+                                      "count":  2,
+                                      "word":  "njun"
+                                  }
+                              ],
+                "words":  50
+            }
+}
