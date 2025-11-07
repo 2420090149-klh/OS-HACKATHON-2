@@ -64,7 +64,10 @@
     </div>
     
     <h2>CLI-style Report</h2>
-    <div style="margin-bottom:8px;"><button id="reportBtn">Show Report</button></div>
+    <div style="margin-bottom:8px;">
+      <button id="reportBtn">Show Report</button>
+      <button id="downloadBtn" style="margin-left:8px;">Download report (.txt)</button>
+    </div>
     <div class="card" style="background:#111; color:#eee; font-family:monospace;">
       <pre id="report" style="white-space:pre-wrap;">-</pre>
     </div>
@@ -118,6 +121,36 @@
         });
         const txt = await res.text();
         document.getElementById('report').textContent = txt;
+      });
+
+      document.getElementById('downloadBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('downloadBtn');
+        btn.disabled = true;
+        btn.textContent = 'Preparing...';
+        try {
+          const text = document.getElementById('inputText').value;
+          const res = await fetch('/report', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({text})
+          });
+          const txt = await res.text();
+
+          const blob = new Blob([txt], {type: 'text/plain'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'report.txt';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          alert('Failed to download report');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Download report (.txt)';
+        }
       });
     </script>
   </body>
