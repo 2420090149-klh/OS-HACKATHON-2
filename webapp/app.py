@@ -62,5 +62,16 @@ def analyze():
     return jsonify(result)
 
 
+@app.route("/report", methods=["POST"])
+def report():
+    data = request.get_json(silent=True) or request.form
+    text = data.get("text", "")
+    try:
+        report_text = analyzer.generate_report_text(text)
+    except Exception:
+        report_text = "Error generating report"
+    return app.response_class(report_text, mimetype='text/plain')
+
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

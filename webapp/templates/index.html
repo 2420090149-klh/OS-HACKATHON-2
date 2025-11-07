@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <h2>Output</h2>
+  <h2>Output</h2>
     <div class="row">
       <div class="card" style="flex:1">
         <h3>Basic</h3>
@@ -61,6 +61,12 @@
     <h3>Evidence lines</h3>
     <div class="card">
       <pre id="evidence">-</pre>
+    </div>
+    
+    <h2>CLI-style Report</h2>
+    <div style="margin-bottom:8px;"><button id="reportBtn">Show Report</button></div>
+    <div class="card" style="background:#111; color:#eee; font-family:monospace;">
+      <pre id="report" style="white-space:pre-wrap;">-</pre>
     </div>
 
     <script>
@@ -101,6 +107,17 @@
         // Render evidence lines (flatten all evidence)
         const ev = findings.flatMap(f => f.evidence || []);
         document.getElementById('evidence').textContent = ev.length ? ev.join('\n') : '-';
+      });
+
+      document.getElementById('reportBtn').addEventListener('click', async () => {
+        const text = document.getElementById('inputText').value;
+        const res = await fetch('/report', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({text})
+        });
+        const txt = await res.text();
+        document.getElementById('report').textContent = txt;
       });
     </script>
   </body>
