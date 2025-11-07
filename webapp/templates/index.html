@@ -43,6 +43,26 @@
       </div>
     </div>
 
+    <h2>Findings</h2>
+    <div class="card">
+      <table id="findingsTable" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Severity</th>
+            <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Rule ID</th>
+            <th style="text-align:left; padding:8px; border-bottom:1px solid #ddd">Suggestion</th>
+            <th style="text-align:right; padding:8px; border-bottom:1px solid #ddd">Hits</th>
+          </tr>
+        </thead>
+        <tbody id="findingsBody"></tbody>
+      </table>
+    </div>
+
+    <h3>Evidence lines</h3>
+    <div class="card">
+      <pre id="evidence">-</pre>
+    </div>
+
     <script>
       const analyzeBtn = document.getElementById('analyzeBtn');
       analyzeBtn.addEventListener('click', async () => {
@@ -63,6 +83,24 @@
           top_words: n.top_words.slice(0,5),
         };
         document.getElementById('nlp').textContent = JSON.stringify(short, null, 2);
+
+        // Render findings table
+        const findings = data.findings || [];
+        const tbody = document.getElementById('findingsBody');
+        tbody.innerHTML = '';
+        if (findings.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="padding:8px">No findings detected</td></tr>';
+        } else {
+          findings.forEach(f => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style="padding:8px">${f.severity}</td><td style="padding:8px">${f.rule_id}</td><td style="padding:8px">${f.suggestion}</td><td style="padding:8px; text-align:right">${f.hits}</td>`;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Render evidence lines (flatten all evidence)
+        const ev = findings.flatMap(f => f.evidence || []);
+        document.getElementById('evidence').textContent = ev.length ? ev.join('\n') : '-';
       });
     </script>
   </body>

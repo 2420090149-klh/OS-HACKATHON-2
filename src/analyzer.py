@@ -210,3 +210,77 @@ def _main() -> None:
 
 if __name__ == "__main__":
     _main()
+
+
+def summarize_findings(text: str) -> List[Dict[str, Any]]:
+    """Return a small set of rule-based findings extracted from raw text.
+
+    This is a lightweight heuristic summarizer intended for demo/visualization.
+    It searches for common log patterns and returns findings with severity,
+    rule id, suggestion and number of hits plus matching evidence lines.
+    """
+    if not text:
+        return []
+
+    import re
+
+    rules = [
+        {
+            "id": "oom_killer",
+            "patterns": [r"out of memory", r"kill process", r"oom"],
+            "severity": "high",
+            "suggestion": "Increase swap; limit memory or identify process causing OOM."
+        },
+        {
+            "id": "ext4_error",
+            "patterns": [r"ext4", r"filesystem error", r"EXT4"],
+            "severity": "high",
+            "suggestion": "Backup data; run SMART and fsck to check/repair the disk."
+        },
+        {
+            "id": "connection_refused",
+            "patterns": [r"connection refused", r"refused connect", r"connection refused"],
+            "severity": "medium",
+            "suggestion": "Check if the service is listening and firewall rules."
+        },
+        {
+            "id": "dns_failure",
+            "patterns": [r"dns", r"resolv.conf", r"name or service not known", r"NXDOMAIN"],
+            "severity": "medium",
+            "suggestion": "Verify DNS configuration (resolv.conf) and upstream nameservers."
+        },
+        {
+            "id": "ssh_bruteforce",
+            "patterns": [r"failed password", r"authentication failure", r"ssh"],
+            "severity": "low",
+            "suggestion": "Harden SSH: use key auth, disable root login, enable fail2ban."
+        },
+    ]
+
+    findings: List[Dict[str, Any]] = []
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+
+    for rule in rules:
+        count = 0
+        evidence: List[str] = []
+        for pat in rule["patterns"]:
+            for i, line in enumerate(lines):
+                if re.search(pat, line, re.IGNORECASE):
+                    count += 1
+                    # store up to 3 unique evidence lines
+                    if len(evidence) < 3 and line not in evidence:
+                        evidence.append(line)
+
+        if count > 0:
+            findings.append({
+                "severity": rule["severity"],
+                "rule_id": rule["id"],
+                "suggestion": rule["suggestion"],
+                "hits": count,
+                "evidence": evidence,
+            })
+
+    # sort findings roughly by severity then hits
+    severity_rank = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    findings.sort(key=lambda f: (severity_rank.get(f["severity"], 4), -f["hits"]))
+    return findings

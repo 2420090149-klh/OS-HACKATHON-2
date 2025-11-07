@@ -1,4 +1,12 @@
+import os
+import sys
 from flask import Flask, render_template, request, jsonify
+
+# Ensure the project root is first on sys.path so our local `src` package is used
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+
 from src import analyzer
 
 app = Flask(__name__, template_folder="templates")
@@ -17,6 +25,11 @@ def analyze():
 
     basic = analyzer.analyze_text(text)
     nlp = analyzer.analyze_text_nlp(text)
+    findings = []
+    try:
+        findings = analyzer.summarize_findings(text)
+    except Exception:
+        findings = []
 
     # Normalize top_words for JSON-friendly output
     top_words = nlp.get("top_words", [])
@@ -43,6 +56,7 @@ def analyze():
             "pos_tags": nlp.get("pos_tags", {}),
             "top_words": top_words_out,
         },
+        "findings": findings,
     }
 
     return jsonify(result)
