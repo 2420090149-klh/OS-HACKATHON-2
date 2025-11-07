@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text Analyzer — Quick Demo</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 12px; }
+      textarea { width: 100%; height: 160px; font-size: 14px; }
+      .row { display:flex; gap:12px; }
+      .card { border:1px solid #ddd; padding:12px; border-radius:6px; background:#fafafa; }
+      pre { white-space:pre-wrap; word-break:break-word; }
+      .muted { color:#666; font-size:13px }
+    </style>
+  </head>
+  <body>
+    <h1>Text Analyzer — Quick Demo</h1>
+
+    <p class="muted">Paste some text, click Analyze, and see a short process + results below.</p>
+
+    <textarea id="inputText">The quick brown fox jumps over the lazy dog. This is a test sentence!</textarea>
+    <div style="margin-top:12px;">
+      <button id="analyzeBtn">Analyze</button>
+    </div>
+
+    <h2>Process (short)</h2>
+    <div class="card">
+      <div id="process">1) counted lines, words, characters
+      <br>2) tokenized into sentences and tokens
+      <br>3) filtered stopwords & calculated POS tag counts
+      </div>
+    </div>
+
+    <h2>Output</h2>
+    <div class="row">
+      <div class="card" style="flex:1">
+        <h3>Basic</h3>
+        <pre id="basic">-</pre>
+      </div>
+      <div class="card" style="flex:2">
+        <h3>NLP (short)</h3>
+        <pre id="nlp">-</pre>
+      </div>
+    </div>
+
+    <script>
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.addEventListener('click', async () => {
+        const text = document.getElementById('inputText').value;
+        const res = await fetch('/analyze', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({text})
+        });
+        const data = await res.json();
+        document.getElementById('basic').textContent = JSON.stringify(data.basic, null, 2);
+
+        const n = data.nlp;
+        const short = {
+          sentences: n.sentences,
+          tokens: n.tokens,
+          words: n.words,
+          top_words: n.top_words.slice(0,5),
+        };
+        document.getElementById('nlp').textContent = JSON.stringify(short, null, 2);
+      });
+    </script>
+  </body>
+</html>
